@@ -102,12 +102,12 @@ Hello mqtt
 
 If you want to run your own MQTT broker, you can use
 [Mosquitto](http://mosquitto.org) or
-[Mosca](http://mcollina.github.io/mosca/), and launch it.
-You can also use a test instance: test.mosquitto.org and test.mosca.io
-are both public.
+[Aedes-cli](https://github.com/moscajs/aedes-cli), and launch it.
+
+You can also use a test instance: test.mosquitto.org.
 
 If you do not want to install a separate broker, you can try using the
-[mqtt-connection](https://www.npmjs.com/package/mqtt-connection).
+[Aedes](https://github.com/moscajs/aedes).
 
 to use MQTT.js in the browser see the [browserify](#browserify) section
 
@@ -322,6 +322,7 @@ the `connect` event. Typically a `net.Socket`.
         urls which upon reconnect can have become expired.
   * `resubscribe` : if connection is broken and reconnects,
      subscribed topics are automatically subscribed again (default `true`)
+  * `messageIdProvider`: custom messageId provider. when `new UniqueMessageIdProvider()` is set, then non conflict messageId is provided.
 
 In case mqtts (mqtt over tls) is required, the `options` object is
 passed through to
@@ -652,12 +653,20 @@ const client  = connect('alis://test.mosquitto.org');
 
 In order to use MQTT.js as a browserify module you can either require it in your browserify bundles or build it as a stand alone module. The exported module is AMD/CommonJs compatible and it will add an object in the global space.
 
-```javascript
-npm install -g browserify // install browserify
-cd node_modules/mqtt
-npm install . // install dev dependencies
-browserify mqtt.js -s mqtt > browserMqtt.js // require mqtt in your client-side app
+```bash
+mkdir tmpdir
+cd tmpdir
+npm install mqtt
+npm install browserify
+npm install tinyify
+cd node_modules/mqtt/
+npm install .
+npx browserify mqtt.js -s mqtt >browserMqtt.js // use script tag 
+# show size for compressed browser transfer
+gzip <browserMqtt.js | wc -c
 ```
+
+**Be sure to only use this bundle with `ws` or `wss` URLs in the browser. Others URL types will likey fail**
 
 <a name="webpack"></a>
 ### Webpack
@@ -734,7 +743,7 @@ export default () => {
 }
 ```
 
-Your broker should accept websocket connection (see [MQTT over Websockets](https://github.com/mcollina/mosca/wiki/MQTT-over-Websockets) to setup [Mosca](http://mcollina.github.io/mosca/)).
+Your broker should accept websocket connection (see [MQTT over Websockets](https://github.com/moscajs/aedes/blob/master/docs/Examples.md#mqtt-server-over-websocket-using-server-factory) to setup [Aedes](https://github.com/moscajs/aedes)).
 
 <a name="qos"></a>
 ## About QoS
